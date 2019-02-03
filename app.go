@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"strconv"
 	"io/ioutil"
-	"encoding/json"
+	// "encoding/json"
 )
 
 type Characters struct {
@@ -31,22 +31,94 @@ func main() {
 	// Start
 	var op string
 	println("Seleccionar opcción:")
-	println("[1] Buscar personaje")
+	println("[1] Buscar personajes")
 	println("[2] Listar personajes")
+	print("> ")
 	fmt.Scanln(&op)
 
 	if op == "1" {
-		p("Escribir el nombre del personaje")
-		var name string
-		fmt.Scanln(&name)
-		URL := "http://gateway.marvel.com/v1/public/characters?name="+name+"&ts="+ts+"&apikey="+publicKey+"&hash="+hash
-		res, err := http.Get(URL)
-		if err != nil{
+		p("[1] Buscar un personaje")
+		p("[2] Empiezan por")
+		var charOp string
+		print("> ")
+		fmt.Scanln(&charOp)
+
+		if charOp == "1" {
+			// Un solo personaje
+			p("Escribir el nombre del personaje")
+			var name string
+			fmt.Scanln(&name)
+			// URL
+			URL := "http://gateway.marvel.com/v1/public/characters?name="+name+"&ts="+ts+"&apikey="+publicKey+"&hash="+hash
+			// Peticion GET
+			res, err := http.Get(URL)
+			if err != nil{
 			fmt.Printf("Error %s", err)
-		} else{
-			body, _ := ioutil.ReadAll(res.Body)
-			data := fmt.Sprintf("%s",body)
-		}
+			} else{
+			data, _ := ioutil.ReadAll(res.Body)
+			p(string(data))
+			}
+		} else if charOp == "2"{
+			// Empeizan por
+			print("> ")
+			startWith := StartWith()
+			p("Ordenado por:")
+			p("[1] Nombre (Ascendente)")
+			p("[2] Nombre (Descendente)")
+			p("[3] Modificación (Ascendente)")
+			p("[4] Modificación (Descendente)")
+			var orderOp string
+			print("> ")
+			fmt.Scanln(&orderOp)
+	
+			if orderOp == "1" {
+				order := "name"
+				URL := "http://gateway.marvel.com/v1/public/characters?nameStartsWith="+startWith+"&orderBy="+order+"&ts="+ts+"&apikey="+publicKey+"&hash="+hash
+				// Peticion GET
+				res, err := http.Get(URL)
+				if err != nil{
+				fmt.Printf("Error %s", err)
+				} else{
+				data, _ := ioutil.ReadAll(res.Body)
+				p(string(data))
+				}
+			} else if orderOp == "2"{
+				order := "-name"
+				URL := "http://gateway.marvel.com/v1/public/characters?nameStartsWith="+startWith+"&orderBy="+order+"&ts="+ts+"&apikey="+publicKey+"&hash="+hash
+				// Peticion GET
+				res, err := http.Get(URL)
+				if err != nil{
+				fmt.Printf("Error %s", err)
+				} else{
+				data, _ := ioutil.ReadAll(res.Body)
+				p(string(data))
+				}
+			} else if orderOp == "3"{
+				order := "modified"
+				URL := "http://gateway.marvel.com/v1/public/characters?nameStartsWith="+startWith+"&orderBy="+order+"&ts="+ts+"&apikey="+publicKey+"&hash="+hash
+				// Peticion GET
+				res, err := http.Get(URL)
+				if err != nil{
+				fmt.Printf("Error %s", err)
+				} else{
+				data, _ := ioutil.ReadAll(res.Body)
+				p(string(data))
+				}
+			} else if orderOp == "4"{
+				order := "-modified"
+				URL := "http://gateway.marvel.com/v1/public/characters?nameStartsWith="+startWith+"&orderBy="+order+"&ts="+ts+"&apikey="+publicKey+"&hash="+hash
+				// Peticion GET
+				res, err := http.Get(URL)
+				if err != nil{
+				fmt.Printf("Error %s", err)
+				} else{
+				data, _ := ioutil.ReadAll(res.Body)
+				p(string(data))
+				}
+			} else if orderOp != "1" && orderOp != "2" && orderOp != "3" && orderOp != "4"{	
+				p("Opcción inválida")}
+		} else if charOp != "1" && charOp != "2"{
+			p("Opcción inválida")}		
 	}
 	if op == "2"{
 		URL := "http://gateway.marvel.com/v1/public/characters?ts="+ts+"&apikey="+publicKey+"&hash="+hash
@@ -67,4 +139,10 @@ func GetMD5Hash(ts, privateKey, publicKey string) string {
     hasher := md5.New()
     hasher.Write([]byte(ts + privateKey + publicKey))
     return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func StartWith () string {
+	var text string
+	fmt.Scanln(&text)
+	return text
 }
